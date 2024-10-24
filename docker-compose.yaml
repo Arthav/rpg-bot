@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: rpg_db_postgres
+    environment:
+      POSTGRES_USER: my_user_rpg
+      POSTGRES_PASSWORD: my_password_rpg
+      POSTGRES_DB: my_database_rpg
+    ports:
+      - "5555:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  bot:
+    build: .
+    container_name: rpg_bot
+    environment:
+      BOT_TOKEN: ${BOT_TOKEN}  # Assuming you set these in your .env file
+      DATABASE_URL: ${DATABASE_URL}
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:
