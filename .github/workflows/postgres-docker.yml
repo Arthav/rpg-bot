@@ -1,0 +1,43 @@
+name: Run PostgreSQL with Docker
+
+on: 
+  push:
+    branches:
+      - main
+
+jobs:
+  setup-postgres:
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_USER: my_user_rpg
+          POSTGRES_PASSWORD: my_password_rpg
+          POSTGRES_DB: my_database_rpg
+        ports:
+          - 5555:5432
+        options: >-
+          --health-cmd "pg_isready -U my_user_rpg"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Compose
+        run: |
+          docker-compose up -d
+      
+      - name: Wait for PostgreSQL to be ready
+        run: |
+          until docker exec rpg_db_postgres pg_isready -U my_user_rpg; do
+            echo "Waiting for postgres container..."
+            sleep 2
+          done
+
+      - name: Verify PostgreSQL is running
+        run: docker exec rpg_db_postgres psql -U my_user_rpg -c '\l'

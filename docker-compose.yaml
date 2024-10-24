@@ -13,14 +13,5 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
-  bot:
-    build: .
-    container_name: rpg_bot
-    environment:
-      BOT_TOKEN: ${BOT_TOKEN}  # Assuming you set these in your .env file
-      DATABASE_URL: ${DATABASE_URL}
-    depends_on:
-      - postgres
-
 volumes:
   postgres_data:
